@@ -1,0 +1,26 @@
+<h1>Search TV Shows</h1>
+
+<form #form="ngForm" (ngSubmit)="search(form)">
+
+  Search: <input type="text" name="searchTerm" ngModel required>
+
+  <button type="submit" [disabled]="form.invalid">
+    Search
+  </button>
+</form>
+
+<div *ngFor="let tv of tvShows">
+  <table>
+    <tr>
+      <td>
+        <img [src]="tv.image" alt="">
+      </td>
+      <td>
+        <h3>{{ tv.name }}</h3>
+        <div [innerHTML]="tv.summary">
+        </div>
+      </td>
+    </tr>
+  </table>
+
+</div>
