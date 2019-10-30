@@ -43,8 +43,8 @@ app.get('/api/tv_show/:tvid',
 
 app.get('/api/tv_shows',
 	(req, resp) => {
-		const size = parseInt(req.size) || 20;
-		const skip = parseInt(req.skip) || 0;
+		const size = parseInt(req.query.size) || 20;
+		const skip = parseInt(req.query.skip) || 0;
 
 		pool.getConnection(
 			(err, conn) => {
