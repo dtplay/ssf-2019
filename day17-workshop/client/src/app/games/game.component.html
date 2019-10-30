@@ -1,0 +1,13 @@
+<mat-card *ngFor="let g of games">
+  <mat-card-header>
+    <mat-card-title>{{ g.name }}</mat-card-title>
+  </mat-card-header>
+
+  <img mat-card-image [src]="g.image" alt="">
+
+  <mat-card-actions>
+    <button mat-button (click)="viewComments(g.comment)">COMMENTS</button>
+
+  </mat-card-actions>
+
+</mat-card>
