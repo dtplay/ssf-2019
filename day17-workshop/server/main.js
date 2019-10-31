@@ -14,9 +14,13 @@ const pool = mysql.createPool(require('./config'));
 // SQL
 const GET_GAMES = 'select * from game order by ranking limit ? offset ?';
 const GET_COMMENTS_BY_GID = 'select * from comment where gid = ? limit 50';
+const GET_GAMES_BY_NAME = 'select * from game where name like ? limit 5';
+const COUNT_GAMES = 'select count(*) as game_count from game where name like ?';
 
 const getGames = mkQuery(GET_GAMES, pool);
 const getCommentsByGid = mkQuery(GET_COMMENTS_BY_GID, pool);
+const getGamesByName = mkQuery(GET_GAMES_BY_NAME, pool);
+const countGames = mkQuery(COUNT_GAMES, pool);
 
 const app = express();
 
@@ -30,6 +34,53 @@ app.use(morgan('tiny'));
 app.get('/health', 
     (req, resp) => {
         //ping the database
+    }
+)
+
+/* 
+    { 
+        games: [],
+        count: 200
+    }
+*/
+app.get('/api/search',
+    (req, resp) => {
+        const q = `%${req.query.q}%` || '';
+        const p0 = getGamesByName([ q ])
+        const p1 = countGames([ q ])
+        Promise.all([ p0, p1 ])
+            .then(results => {
+                const r0 = results[0];
+                const r1 = results[1];
+                console.info('>r1 = ', r1);
+                resp.status(200).json({
+                    games: r0, 
+                    count: r1[0].game_count
+                })
+            })
+            .catch(error => {
+                resp.status(500).json({ message: JSON.stringify(error) });
+            })
+    }
+)
+
+app.get('/api/search/sequential',
+    (req, resp) => {
+        const q = `%${req.query.q}%` || '';
+        const p1 = countGames([ q ])
+        getGamesByName([ q ])
+            .then(result => {
+                return Promise.all([ Promise.resolve(result), countGames([ q ])])
+            })
+            .then(results => {
+                const r0 = results[0];
+                const r1 = results[1];
+                console.info('>r1 = ', r1);
+                resp.status(200).json({
+                    games: r0, 
+                    count: r1[0].game_count
+                })
+            })
     }
 )
 
