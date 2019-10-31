@@ -86,6 +86,8 @@ app.get('/api/games',
     }
 )
 
+app.use(express.static(__dirname + '/public'));
+
 app.use((req, resp) => {
     // Response 404 in JSON
     resp.status(404).json({ message: `Not found: ${req.originalUrl}` });

@@ -17,7 +17,7 @@ export class BGGService {
 
     return (
       this.http.get<Boardgame[]>(
-          'http://localhost:3000/api/games', { params })
+          '/api/games', { params })
         .toPromise()
     );
   }
@@ -25,7 +25,7 @@ export class BGGService {
   getComments(gid: number): Promise<Comment[]> {
     const commentUrl = `/api/comment/${gid}`
     return (
-      this.http.get<Comment[]>(`http://localhost:3000${commentUrl}`)
+      this.http.get<Comment[]>(`${commentUrl}`)
         .toPromise()
     );
   }

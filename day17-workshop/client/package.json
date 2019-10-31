@@ -7,7 +7,9 @@
     "build": "ng build",
     "test": "ng test",
     "lint": "ng lint",
-    "e2e": "ng e2e"
+    "e2e": "ng e2e",
+    "start-proxy": "ng serve --proxy-config proxy-config.js",
+    "open-browser": "ng serve -o"
   },
   "private": true,
   "dependencies": {

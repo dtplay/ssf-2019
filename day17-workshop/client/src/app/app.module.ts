@@ -15,7 +15,7 @@ const MODULES: Routes = [
   { path: 'bgg',
     // Lazy loading
     loadChildren: () => import('./games/games.module').then(m => m.GamesModule),
-    canActivateChild: [ AuthService ]
+    //canActivateChild: [ AuthService ]
   },
   { path: '**', redirectTo: '/bgg', pathMatch: 'full' }
 ];
@@ -27,7 +27,9 @@ const MODULES: Routes = [
   ],
   imports: [
     BrowserModule, BrowserAnimationsModule,
-    FormsModule, RouterModule.forRoot(MODULES),
+    FormsModule,
+    // useHash to use hash for routes instead of urls
+    RouterModule.forRoot(MODULES, { useHash: true }),
     MaterialModule
   ],
   providers: [ AuthService ],
