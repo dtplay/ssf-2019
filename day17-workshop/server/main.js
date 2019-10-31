@@ -3,16 +3,20 @@ const express = require('express');
 const cors = require('cors');
 const mysql = require('mysql');
 const morgan = require('morgan');
-
-// SQL
-const GET_GAMES = 'select * from game order by ranking limit ? offset ?';
-const GET_COMMENTS_BY_GID = 'select * from comment where gid = ? limit 50';
+const mkQuery = require('./dbutil');
 
 // Configure the application
 const PORT = parseInt(process.argv[2] || process.env.APP_PORT) || 3000;
 
 // Setup a connection pool for MySQL
 const pool = mysql.createPool(require('./config'));
+
+// SQL
+const GET_GAMES = 'select * from game order by ranking limit ? offset ?';
+const GET_COMMENTS_BY_GID = 'select * from comment where gid = ? limit 50';
+
+const getGames = mkQuery(GET_GAMES, pool);
+const getCommentsByGid = mkQuery(GET_COMMENTS_BY_GID, pool);
 
 const app = express();
 
@@ -32,22 +36,15 @@ app.get('/health',
 // GET /api/comments/:gid
 app.get('/api/comment/:gid',
 	(req, resp) => {
-		const gid = parseInt(req.params.gid);
-
-		pool.getConnection(
-			(err, conn) => {
-				if (err)
-					return resp.status(500).json({ message: JSON.stringify(err) });
-				conn.query(GET_COMMENTS_BY_GID, [ gid ],
-					(err, result) => {
-						conn.release();
-						if (err)
-							return resp.status(500).json({ message: JSON.stringify(err) });
-						resp.status(200).json(result);
-					}
-				)
-			}
-		);
+        const gid = parseInt(req.params.gid);
+        
+        getCommentsByGid([ gid ])
+            .then(result => {
+                resp.status(200).json(result);
+            })
+            .catch(error => {
+                resp.status(500).json({ message: JSON.stringify(error) });
+            })
 	}
 );
 
@@ -60,30 +57,20 @@ app.get('/api/games',
         const limit = parseInt(req.query.limit) || 20;
         const offset = parseInt(req.query.offset) || 0;
 
-        // Get a connection from the pool
-        pool.getConnection(
-            (err, conn) => {
-                if (err)
-                    return resp.status(500).json({ message: JSON.stringify(err) });
-
-                conn.query(
-                    GET_GAMES, [ limit, offset ],
-                    (err, result) => {
-                        conn.release();
-                        if (err)
-                            return resp.status(500).json({ message: JSON.stringify(err) });
-                        resp.status(200)
-                            .json(
-                                result.map(v => {
-                                    v.comment = `/api/comment/${v.gid}`;
-                                    return (v);
-                                })
-                            )
-                    }
-                )
-            }
-        )
-    }
+        getGames([ limit, offset ])
+            .then(result => {
+                resp.status(200)
+                    .json(
+                        result.map(v => {
+                            v.comment = `/api/comment/${v.gid}`;
+                            return (v);
+                        })
+                    )
+            })
+            .catch(error => {
+                resp.status(500).json({ message: JSON.stringify(error) });
+            })
+        }
 )
 
 app.use(express.static(__dirname + '/public'));
