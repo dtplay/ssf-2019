@@ -8,3 +8,11 @@ export interface Boardgame {
   image: string;
   comment: string;
 }
+
+export interface Comment {
+  c_id: string;
+  user: string;
+  rating: number;
+  c_text: string;
+  gid: number;
+}

@@ -5,7 +5,8 @@ const mysql = require('mysql');
 const morgan = require('morgan');
 
 // SQL
-const GET_GAMES = "select * from game order by ranking limit ? offset ?";
+const GET_GAMES = 'select * from game order by ranking limit ? offset ?';
+const GET_COMMENTS_BY_GID = 'select * from comment where gid = ? limit 50';
 
 // Configure the application
 const PORT = parseInt(process.argv[2] || process.env.APP_PORT) || 3000;
@@ -29,6 +30,26 @@ app.get('/health',
 )
 
 // GET /api/comments/:gid
+app.get('/api/comment/:gid',
+	(req, resp) => {
+		const gid = parseInt(req.params.gid);
+
+		pool.getConnection(
+			(err, conn) => {
+				if (err)
+					return resp.status(500).json({ message: JSON.stringify(err) });
+				conn.query(GET_COMMENTS_BY_GID, [ gid ],
+					(err, result) => {
+						conn.release();
+						if (err)
+							return resp.status(500).json({ message: JSON.stringify(err) });
+						resp.status(200).json(result);
+					}
+				)
+			}
+		);
+	}
+);
 
 // GET /api/games?limit=20&offset=10
 // Default for limit = 20
@@ -54,7 +75,7 @@ app.get('/api/games',
                         resp.status(200)
                             .json(
                                 result.map(v => {
-                                    v.comment = '';
+                                    v.comment = `/api/comment/${v.gid}`;
                                     return (v);
                                 })
                             )

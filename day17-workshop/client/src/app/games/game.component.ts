@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { BGGService } from './bgg.service';
 import { Boardgame } from './models';
+import { Router, ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-game',
@@ -11,7 +12,8 @@ export class GameComponent implements OnInit {
 
   games: Boardgame[] = [];
 
-  constructor(private bggSvc: BGGService) { }
+  constructor(private bggSvc: BGGService, private router: Router,
+    private activatedRoute: ActivatedRoute) { }
 
   ngOnInit() {
     console.log(this.bggSvc);
@@ -22,7 +24,7 @@ export class GameComponent implements OnInit {
       })
   }
 
-  viewComments(commentUrl) {
-    console.info('>> comments: ', commentUrl);
+  viewComments(gid: number) {
+    this.router.navigate(['comment', gid], { relativeTo: this.activatedRoute });
   }
 }

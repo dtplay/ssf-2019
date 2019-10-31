@@ -1,13 +1,9 @@
-<mat-card *ngFor="let g of games">
-  <mat-card-header>
-    <mat-card-title>{{ g.name }}</mat-card-title>
-  </mat-card-header>
-
-  <img mat-card-image [src]="g.image" alt="">
-
-  <mat-card-actions>
-    <button mat-button (click)="viewComments(g.comment)">COMMENTS</button>
-
-  </mat-card-actions>
-
-</mat-card>
+<mat-list>
+  <mat-list-item *ngFor="let g of games" (click)="viewComments(g.gid)">
+    <img matListAvatar [src]="g.image" alt="">
+    <div class="game-details">
+      <div mat-line class="game-title">{{ g.name }}</div>
+      <div mat-line>Rank: {{ g.ranking }}</div>
+    </div>
+  </mat-list-item>
+</mat-list>

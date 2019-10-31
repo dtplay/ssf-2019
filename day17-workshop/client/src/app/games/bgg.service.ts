@@ -2,7 +2,7 @@ import { Injectable } from "@angular/core";
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { tap } from 'rxjs/operators';
 
-import { Boardgame } from './models';
+import { Boardgame, Comment } from './models';
 
 @Injectable()
 export class BGGService {
@@ -22,4 +22,11 @@ export class BGGService {
     );
   }
 
+  getComments(gid: number): Promise<Comment[]> {
+    const commentUrl = `/api/comment/${gid}`
+    return (
+      this.http.get<Comment[]>(`http://localhost:3000${commentUrl}`)
+        .toPromise()
+    );
+  }
 }

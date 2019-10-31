@@ -1,0 +1,17 @@
+<form #form="ngForm" (ngSubmit)="performLogin(form)"
+    fxLayout="column row" fxLayoutGap="1vh" class="body">
+  <mat-form-field>
+    <input type="text" name="username" placeholder="Please enter your username"
+        ngModel matInput required>
+  </mat-form-field>
+
+  <mat-form-field>
+    <input type="password" name="password" placeholder="Please enter your password"
+        ngModel matInput required>
+  </mat-form-field>
+
+  <button type="submit" mat-raised-button color="accent" [disabled]="form.invalid">
+    Login
+  </button>
+
+</form>
