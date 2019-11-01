@@ -63,6 +63,12 @@ const botMessage = (req, resp, next) => {
 			entities: m.entities || []
 		}
 
+		if (req.telegram.text == '/start')
+			req.telegram.type = 'start';
+
+		else if (req.telegram.text.startsWith('/newstories'))
+			req.telegram.type = 'newstories';
+
 	} else if ('callback_query' in req.body) {
 		m = req.body.callback_query;
 		req.telegram = {
@@ -75,15 +81,11 @@ const botMessage = (req, resp, next) => {
 		}
 	}
 
-	if (!req.telegram.type) {
-		if (req.telegram.text == '/start')
-			req.telegram.type = 'start';
-
-		else if (req.telegram.text.startsWith('/newstories'))
-			req.telegram.type = 'newstories';
-
-		else 
-			req.telegram.type = 'error';
+	// If the message type is not message, edited_message, callback_query
+	// then this will break;
+	else {
+		// need to find out the chat_id
+		req.telegram.type = 'error';
 	}
 
 	next();
